@@ -162,7 +162,7 @@ cython_debug/
 **/data/
 .ipynb_checkpoints
 .bin
-**/*.db
+*.db
 
 *.parquet
 *.html
