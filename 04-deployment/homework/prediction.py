@@ -7,6 +7,9 @@ import pandas as pd
 from flask import Flask, request, jsonify
 
 
+categorical = ['PULocationID', 'DOLocationID']
+
+
 def get_model(path):
     with open(path, 'rb') as f_in:
         dv, model = pickle.load(f_in)
@@ -15,8 +18,6 @@ def get_model(path):
 
 def read_data(filename):
     df = pd.read_parquet(filename)
-
-    categorical = ['PULocationID', 'DOLocationID']
     
     df['duration'] = df.tpep_dropoff_datetime - df.tpep_pickup_datetime
     df['duration'] = df.duration.dt.total_seconds() / 60
@@ -38,13 +39,14 @@ def get_prediction(df, dv, model):
 app = Flask('predict-duration-mean')
 
 
-@app.route('predict/', methods=['POST'])
+@app.route('/predict', methods=['POST'])
 def predict():
     data = request.get_json()
     year = data['year']
     month = data['month']
     df = read_data(f'https://d37ci6vzurychx.cloudfront.net/trip-data/yellow_tripdata_{year:02d}-{month:02d}.parquet')
-    pred = get_prediction(df, get_model('model.bin'))
+    dv, model = get_model('model.bin')
+    pred = get_prediction(df, dv, model)
     result = {
         "mean": pred.mean(),
         "std": pred.std()
