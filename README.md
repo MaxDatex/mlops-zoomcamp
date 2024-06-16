@@ -1,3 +1,3 @@
 # mlops-zoomcamp
 
-This is an example
+MLOps zoomcamp practice/homework
